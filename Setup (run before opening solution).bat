@@ -1,4 +1,5 @@
-:: Create junctions (symlinks) to binary references to account for different installation directories on different systems.
+:: Create junctions (symlinks) to binary references to account for different
+:: installation directories on different systems.
 :: Use the dot (.) prefix so dotnet ignores the folder during build.
 
 @echo off

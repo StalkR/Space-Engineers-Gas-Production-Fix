@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <PluginManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Name>Hydrogen Engine Fix</Name>
+  <Name>Gas Production Fix</Name>
   <Guid>5f0ce44b-7caa-4cb5-a940-c5c647d68721</Guid>
-  <Repository>StalkR/Space-Engineers-Hydrogen-Engine-Fix</Repository>
-  <Version>v0.0.2</Version>
+  <Repository>StalkR/Space-Engineers-Gas-Production-Fix</Repository>
+  <Version>v0.0.3</Version>
   <Dependencies></Dependencies>
 </PluginManifest>

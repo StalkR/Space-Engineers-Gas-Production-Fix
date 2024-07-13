@@ -54,6 +54,6 @@ jobs:
             false
           fi
         env:
-          PLUGIN_ZIP: plugin.zip
+          PLUGIN_ZIP: GasProductionFix.zip
           TORCHAPI_USERNAME: ${{ secrets.TORCHAPI_USERNAME }}
           TORCHAPI_SECRET: ${{ secrets.TORCHAPI_SECRET }}

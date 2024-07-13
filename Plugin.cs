@@ -1,20 +1,26 @@
+using HarmonyLib;
 using NLog;
-using System.IO;
 using Torch;
 using Torch.API;
-using Torch.API.Plugins;
 
-namespace StalkR.HydrogenEngineFix
+namespace StalkR.GasProductionFix
 {
-    public class HydrogenEngineFixPlugin : TorchPluginBase
+    public class Plugin : TorchPluginBase
     {
         private static readonly Logger Log = LogManager.GetCurrentClassLogger();
+        private static Harmony harmony;
 
         public override void Init(ITorchBase torch)
         {
             base.Init(torch);
+            harmony = new Harmony(typeof(Plugin).Namespace);
+            harmony.PatchAll();
+            Log.Info($"Gas Production Fix loaded");
+        }
 
-            Log.Info($"Hydrogen Engine Fix loaded");
+        public override void Dispose()
+        {
+            harmony.UnpatchAll(typeof(Plugin).Namespace);
         }
     }
 }

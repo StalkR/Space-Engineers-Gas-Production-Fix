@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <ProjectGuid>{5F0CE44B-7CAA-4CB5-A940-C5C647D68721}</ProjectGuid>
     <TargetFramework>net48</TargetFramework>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <OutputType>Library</OutputType>
@@ -17,7 +18,9 @@
     <PdbPath>none</PdbPath>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System.Net.Http" />
+    <Reference Include="0Harmony">
+      <HintPath>0Harmony.dll</HintPath>
+    </Reference>
     <Reference Include="NLog">
       <HintPath>.GameBinaries\NLog.dll</HintPath>
       <Private>False</Private>
@@ -30,20 +33,12 @@
       <HintPath>.TorchBinaries\Torch.API.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Sandbox.Common">
-      <HintPath>.GameBinaries\Sandbox.Common.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Sandbox.Game">
       <HintPath>.GameBinaries\Sandbox.Game.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="SpaceEngineers.Game">
       <HintPath>.GameBinaries\SpaceEngineers.Game.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="VRage">
-      <HintPath>.GameBinaries\VRage.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="VRage.Game">
@@ -59,7 +54,7 @@
   <Target Name="Zip" AfterTargets="Build">
     <ZipDirectory
       SourceDirectory="$(OutputPath)"
-      DestinationFile="$(MSBuildProjectDirectory)\plugin.zip"
+      DestinationFile="$(MSBuildProjectDirectory)\GasProductionFix.zip"
       Overwrite="true" />
   </Target>
 </Project>
