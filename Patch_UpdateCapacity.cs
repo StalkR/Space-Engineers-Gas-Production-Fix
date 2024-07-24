@@ -50,7 +50,9 @@ namespace StalkR.GasProductionFix
                 //__instance.DisableUpdate(); // not available, we'll just update all the time
             }
             float requiredRate = gasUsed + fillingOffset * MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER;
-            __instance.SinkComp.SetRequiredInputByType(fuelId, requiredRate * 60f);
+            float requiredInput = requiredRate * 60f;
+            while (requiredInput > fillingOffset) requiredInput--; // gently lower if we happen to be above
+            __instance.SinkComp.SetRequiredInputByType(fuelId, requiredInput);
             __instance.CheckEmissiveState();
             SlowLog($"UpdateCapacity" +
                 $" - fuelId={fuelId}" + // MyObjectBuilder_GasProperties/Hydrogen
@@ -64,7 +66,7 @@ namespace StalkR.GasProductionFix
                 $" - isServer={Sync.IsServer}" + // True
                 $" - capacity={capacity} now {__instance.Capacity}" + // 2.083334 now 2.083334
                 $" - fillingOffset={fillingOffset}" + // 5000
-                $" - requiredRate={requiredRate} and *60 = {requiredRate * 60}" + // 5002.083 and *60 = 300125
+                $" - requiredRate={requiredRate} and *60 = {requiredRate * 60} but lowered to {requiredInput}" + // 5002.083 and *60 = 300125 but lowered to 
                 $" - currentOutput={currentOutput} now {__instance.SourceComp.CurrentOutput}" + // 2.5 now 2.5
                 $" - FuelProductionToCapacityMultiplier={blockDefinition.FuelProductionToCapacityMultiplier}" + // 0.02
                 $" - FUEL_CONSUMPTION_MULTIPLIER={MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER}"); // 1
