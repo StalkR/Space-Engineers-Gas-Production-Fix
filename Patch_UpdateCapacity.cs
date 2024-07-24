@@ -38,7 +38,9 @@ namespace StalkR.GasProductionFix
             {
                 gasInput = gasUsed + GetFillingOffset(__instance);
             }
-            bool noGasInputButWeNeed = gasInput == 0f && __instance.SinkComp.RequiredInputByType(fuelId) > 0f;
+            // BDCarrillo's idea:
+            // original: bool noGasInputButWeNeed = gasInput == 0f && __instance.SinkComp.RequiredInputByType(fuelId) > 0f;
+            bool noGasInputButWeNeed = gasInput >= __instance.SinkComp.RequiredInputByType(fuelId);
             float extraGas = gasInput - gasUsed;
             bool hasExtraGas = extraGas != 0f;
             var capacity = __instance.Capacity;
