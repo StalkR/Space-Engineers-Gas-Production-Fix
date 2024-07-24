@@ -5,8 +5,8 @@ using Sandbox.Game.Entities;
 using Sandbox.Game.Multiplayer;
 using SpaceEngineers.Game.Entities.Blocks;
 using System;
+using System.Reflection;
 using VRage.Game;
-using VRage.Game.ObjectBuilders.Definitions;
 using VRageMath;
 
 namespace StalkR.GasProductionFix
@@ -17,15 +17,23 @@ namespace StalkR.GasProductionFix
         static readonly Logger Log = LogManager.GetCurrentClassLogger();
         static int logs = 0;
 
-        static bool Prefix(MyHydrogenEngine __instance)
+        static MethodInfo disableUpdate;
+        static MethodInfo updateDisplay;
+        static void Prepare()
+        {
+            disableUpdate= AccessTools.Method(typeof(MyGasFueledPowerProducer), "DisableUpdate");
+            updateDisplay = AccessTools.Method(typeof(MyGasFueledPowerProducer), "UpdateDisplay");
+        }
+
+        static bool Prefix(MyGasFueledPowerProducer __instance)
         {
             MyGasFueledPowerProducerDefinition blockDefinition = __instance.BlockDefinition;
             MyDefinitionId fuelId = blockDefinition.Fuel.FuelId;
             float currentOutput = __instance.SourceComp.CurrentOutput;
             float currentInput = __instance.SinkComp.CurrentInputByType(fuelId);
+            float requiredInput = __instance.SinkComp.RequiredInputByType(fuelId);
             float gasUsed = __instance.SourceComp.CurrentOutput / blockDefinition.FuelProductionToCapacityMultiplier / 60f;
-            float gasInputStart = __instance.SinkComp.CurrentInputByType(fuelId) / 60f / MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER;
-            float gasInput = gasInputStart;
+            float gasInput= __instance.SinkComp.CurrentInputByType(fuelId) / 60f / MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER;
             if (gasInput == 0f && __instance.IsCreativeModeEnabled)
             {
                 gasInput = gasUsed + GetFillingOffset(__instance);
@@ -40,37 +48,42 @@ namespace StalkR.GasProductionFix
                 {
                     __instance.Capacity += extraGas;
                 }
-                //__instance.UpdateDisplay(); // not available but it does just 2 things:
-                __instance.SetDetailedInfoDirty();
-                __instance.RaisePropertiesChanged();
+                updateDisplay.Invoke(__instance, null);
             }
             float fillingOffset = GetFillingOffset(__instance);
             if (!hasExtraGas && (noGasInputButWeNeed || (fillingOffset == 0f && gasUsed == 0f)))
             {
-                //__instance.DisableUpdate(); // not available, we'll just update all the time
+                disableUpdate.Invoke(__instance, null);
             }
             float requiredRate = gasUsed + fillingOffset * MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER;
-            float requiredInput = requiredRate * 60f;
-            while (requiredInput > fillingOffset) requiredInput--; // gently lower if we happen to be above
-            __instance.SinkComp.SetRequiredInputByType(fuelId, requiredInput);
+            __instance.SinkComp.SetRequiredInputByType(fuelId, requiredRate * 60f);
             __instance.CheckEmissiveState();
             SlowLog($"UpdateCapacity" +
                 $" - fuelId={fuelId}" + // MyObjectBuilder_GasProperties/Hydrogen
                 $" - currentInput={currentInput}" + // 125
+                $" - requiredInput={requiredInput}" +
                 $" - gasUsed={gasUsed}" + // 2.083333
-                $" - gasInput={gasInputStart} now {gasInput}" + // 2.083333 now 2.083333
-                $" - creative={__instance.IsCreativeModeEnabled}" + // False
+                $" - gasInput={gasInput}" + // 2.083333
                 $" - noGasInputButWeNeed={noGasInputButWeNeed}" + // False
                 $" - extraGas={extraGas}" + // 0
-                $" - hasExtraGas={hasExtraGas}" + // False
-                $" - isServer={Sync.IsServer}" + // True
                 $" - capacity={capacity} now {__instance.Capacity}" + // 2.083334 now 2.083334
                 $" - fillingOffset={fillingOffset}" + // 5000
-                $" - requiredRate={requiredRate} and *60 = {requiredRate * 60} but lowered to {requiredInput}" + // 5002.083 and *60 = 300125 but lowered to 
+                $" - requiredRate={requiredRate} and *60 = {requiredRate * 60}" + // 5002.083 and *60 = 300125
                 $" - currentOutput={currentOutput} now {__instance.SourceComp.CurrentOutput}" + // 2.5 now 2.5
                 $" - FuelProductionToCapacityMultiplier={blockDefinition.FuelProductionToCapacityMultiplier}" + // 0.02
                 $" - FUEL_CONSUMPTION_MULTIPLIER={MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER}"); // 1
             return false; // skip original method
+        }
+
+        static float GetFillingOffset(MyGasFueledPowerProducer __instance)
+        {
+            if (__instance.Enabled && __instance.IsFunctional)
+            {
+                float capacity = __instance.Capacity;
+                float fuelCapacity = __instance.BlockDefinition.FuelCapacity;
+                return MathHelper.Clamp(fuelCapacity - capacity, 0f, fuelCapacity / 20f);
+            }
+            return 0f;
         }
 
         static DateTime lastLog = DateTime.MinValue;
@@ -84,19 +97,8 @@ namespace StalkR.GasProductionFix
             }
         }
 
-        static float GetFillingOffset(MyHydrogenEngine __instance)
-        {
-            if (__instance.Enabled && __instance.IsFunctional)
-            {
-                float capacity = __instance.Capacity;
-                float fuelCapacity = __instance.BlockDefinition.FuelCapacity;
-                return MathHelper.Clamp(fuelCapacity - capacity, 0f, fuelCapacity / 20f);
-            }
-            return 0f;
-        }
-
         /*
-        static bool Prefix(MyHydrogenEngine __instance)
+        static bool Prefix(MyGasFueledPowerProducer __instance)
         {
             var fuelId = __instance.BlockDefinition.Fuel.FuelId;
             var current = __instance.SinkComp.CurrentInputByType(fuelId);
