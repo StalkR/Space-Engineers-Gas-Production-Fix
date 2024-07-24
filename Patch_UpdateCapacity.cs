@@ -6,6 +6,7 @@ using Sandbox.Game.Multiplayer;
 using SpaceEngineers.Game.Entities.Blocks;
 using System;
 using VRage.Game;
+using VRage.Game.ObjectBuilders.Definitions;
 using VRageMath;
 
 namespace StalkR.GasProductionFix
@@ -52,21 +53,21 @@ namespace StalkR.GasProductionFix
             __instance.SinkComp.SetRequiredInputByType(fuelId, requiredRate * 60f);
             __instance.CheckEmissiveState();
             SlowLog($"UpdateCapacity" +
-                $" - fuelId={fuelId}" +
-                $" - currentInput={currentInput}" +
-                $" - gasUsed={gasUsed}" +
-                $" - gasInput={gasInputStart} now {gasInput}" +
-                $" - creative={__instance.IsCreativeModeEnabled}" +
-                $" - noGasInputButWeNeed={noGasInputButWeNeed}" +
-                $" - extraGas={extraGas}" +
-                $" - hasExtraGas={hasExtraGas}" +
-                $" - isServer={Sync.IsServer}" +
-                $" - capacity={capacity} now {__instance.Capacity}" +
-                $" - fillingOffset={fillingOffset}" +
-                $" - requiredRate={requiredRate} and *60 = {requiredRate * 60}" +
-                $" - currentOutput={currentOutput} now {__instance.SourceComp.CurrentOutput}" +
-                $" - FuelProductionToCapacityMultiplier={blockDefinition.FuelProductionToCapacityMultiplier}" +
-                $" - FUEL_CONSUMPTION_MULTIPLIER={MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER}");
+                $" - fuelId={fuelId}" + // MyObjectBuilder_GasProperties/Hydrogen
+                $" - currentInput={currentInput}" + // 125
+                $" - gasUsed={gasUsed}" + // 2.083333
+                $" - gasInput={gasInputStart} now {gasInput}" + // 2.083333 now 2.083333
+                $" - creative={__instance.IsCreativeModeEnabled}" + // False
+                $" - noGasInputButWeNeed={noGasInputButWeNeed}" + // False
+                $" - extraGas={extraGas}" + // 0
+                $" - hasExtraGas={hasExtraGas}" + // False
+                $" - isServer={Sync.IsServer}" + // True
+                $" - capacity={capacity} now {__instance.Capacity}" + // 2.083334 now 2.083334
+                $" - fillingOffset={fillingOffset}" + // 5000
+                $" - requiredRate={requiredRate} and *60 = {requiredRate * 60}" + // 5002.083 and *60 = 300125
+                $" - currentOutput={currentOutput} now {__instance.SourceComp.CurrentOutput}" + // 2.5 now 2.5
+                $" - FuelProductionToCapacityMultiplier={blockDefinition.FuelProductionToCapacityMultiplier}" + // 0.02
+                $" - FUEL_CONSUMPTION_MULTIPLIER={MyFueledPowerProducer.FUEL_CONSUMPTION_MULTIPLIER}"); // 1
             return false; // skip original method
         }
 
